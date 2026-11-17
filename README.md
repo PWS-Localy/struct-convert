@@ -1,48 +1,41 @@
 # Struct Convert
 
-**Convert JSON into Go Structs automatically.**
+**Struct Convert** is a modern, lightweight JSON-to-Struct conversion tool designed to make generating strongly typed data structures simple and efficient.
 
-Struct Convert is a developer tool designed to generate Golang structs from JSON data automatically. Instead of manually writing Go struct definitions, developers can simply paste their JSON and instantly generate the corresponding Go structs.
+It analyzes JSON input, infers its data types and structure, and generates corresponding code for the target programming language.
 
-The goal is to make JSON-to-Go conversion faster, easier, and more accurate.
+The project focuses on accuracy, flexibility, and extensibility through a modular conversion engine.
 
-## ✨ Features
+## Features
 
-### Core Features
-- **JSON to Go Struct** — Automatically generate Go structs from JSON.
-- **Object Support** — Support standard JSON objects.
-- **Array Support** — Support JSON arrays, including arrays of objects.
-- **Nested Objects** — Automatically generate nested structs.
-- **Type Inference** — Detect string, integer, float, boolean, object, and array types.
-- **JSON Tags** — Generate JSON struct tags automatically.
-- **Copy Code** — Copy generated Go code to the clipboard.
-- **JSON Validation** — Validate JSON syntax and display parsing errors.
+- **JSON Object Support** — Convert JSON objects into structured types.
+- **JSON Array Support** — Analyze arrays of objects and infer a common schema.
+- **Nested Structures** — Support deeply nested objects and arrays.
+- **Type Inference** — Automatically detect strings, numbers, integers, decimals, booleans, nulls, objects, and arrays.
+- **Optional Fields** — Detect fields that are missing from some objects in an array.
+- **Nullable Fields** — Distinguish between optional fields and fields that can contain `null`.
+- **Union Types** — Handle fields with different types across multiple samples.
+- **Schema Normalization** — Merge and normalize inferred schemas into a consistent structure.
+- **Schema Validation** — Validate schema structure and enforce type constraints.
+- **Extensible Generators** — Designed to support multiple programming languages.
+- **Client-side Processing** — JSON conversion runs locally in the browser without requiring a backend.
 
-### Advanced Features (Planned)
-- [ ] Pointer support (`*string`, `*int`, etc.)
-- [ ] `omitempty` support
-- [ ] Nullable and optional field detection
-- [ ] Custom struct naming
-- [ ] Nested struct naming
-- [ ] Mixed type handling
-- [ ] Multiple JSON samples and schema merging
-- [ ] TypeScript Interface Generator
-- [ ] Java Class Generator
-- [ ] C# Class Generator
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Technology | Purpose |
 |---|---|
-| React | Frontend UI |
-| TypeScript | Application and inference engine |
-| Vite | Build tool |
-| Monaco Editor | Code editor |
+| React | UI development |
+| TypeScript | Type-safe application and engine |
+| Vite | Development server and build tool |
+| Monaco Editor | JSON input and code output editor |
 | Vitest | Unit testing |
-| Oxlint | Code linting |
 | Prettier | Code formatting |
+| Oxlint | Code linting |
+| gofmt | Go code formatting |
 
-## 📁 Project Structure
+## Architecture
+
+The project follows a feature-based architecture. The converter engine is separated from the UI to keep its logic reusable, testable, and independent of the presentation layer.
 
 ```text
 src/
@@ -53,15 +46,42 @@ src/
 ├── features/
 │   └── converter/
 │       ├── components/
+│       │   ├── JsonEditor.tsx
+│       │   ├── StructViewer.tsx
+│       │   ├── ConverterOptions.tsx
+│       │   └── ConverterToolbar.tsx
+│       │
 │       ├── hooks/
+│       │   └── useConverter.ts
+│       │
 │       ├── engine/
 │       │   ├── parser/
+│       │   │   └── json-parser.ts
+│       │   │
 │       │   ├── inference/
+│       │   │   ├── infer-schema.ts
+│       │   │   ├── infer-type.ts
+│       │   │   ├── merge-types.ts
+│       │   │   ├── infer-object.ts
+│       │   │   ├── infer-array.ts
+│       │   │   └── schema.ts
+│       │   │
 │       │   ├── generators/
 │       │   │   └── golang/
+│       │   │       ├── go-generator.ts
+│       │   │       ├── go-type-mapper.ts
+│       │   │       ├── go-naming.ts
+│       │   │       └── go-tags.ts
+│       │   │
 │       │   └── core/
+│       │       └── errors.ts
+│       │
 │       ├── types/
+│       │   └── converter.types.ts
+│       │
 │       ├── constants/
+│       │   └── default-options.ts
+│       │
 │       └── index.ts
 │
 ├── components/
@@ -70,187 +90,231 @@ src/
 ├── lib/
 ├── utils/
 ├── styles/
-│
 ├── App.tsx
 └── main.tsx
 ```
 
-## 🚀 Getting Started
+Additional engine modules, such as schema normalization and validation, may be added within the existing engine structure as the project evolves.
+
+## Conversion Pipeline
+
+The conversion engine follows a modular pipeline:
+
+```text
+JSON Input
+    │
+    ▼
+JSON Parser
+    │
+    ▼
+Type Inference
+    │
+    ▼
+Schema Normalization
+    │
+    ▼
+Schema Validation
+    │
+    ▼
+Code Generator
+    │
+    ▼
+Generated Struct
+```
+
+### 1. JSON Parser
+
+Parses the input JSON string and handles invalid JSON with meaningful errors.
+
+Supported input:
+- JSON Object
+- JSON Array
+- Nested objects
+- Nested arrays
+
+### 2. Type Inference
+
+Analyzes parsed JSON values and generates an initial schema.
+
+Supported types:
+- String
+- Integer
+- Decimal
+- Boolean
+- Null
+- Object
+- Array
+- Union
+
+It also identifies optional and nullable fields when analyzing multiple objects.
+
+### 3. Schema Normalization
+
+Converts inferred schemas into a consistent canonical representation.
+
+Responsibilities:
+- Flatten nested union types.
+- Remove duplicate type variants.
+- Merge compatible object schemas.
+- Normalize number types.
+- Handle nullability.
+- Preserve array metadata.
+- Produce deterministic schema output.
+
+### 4. Schema Validation
+
+Validates the normalized schema before code generation.
+
+Responsibilities:
+- Validate schema structure and metadata.
+- Detect invalid or unsupported types.
+- Enforce configurable type constraints.
+- Limit schema depth and complexity.
+- Report validation issues with their corresponding paths.
+
+### 5. Code Generator
+
+Transforms the validated schema into source code for the selected programming language.
+
+The initial generator targets Go.
+
+## Example
+
+### Input
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Alice",
+    "email": "alice@example.com",
+    "active": true,
+    "profile": {
+      "age": 25
+    }
+  },
+  {
+    "id": 2,
+    "name": "Bob",
+    "active": false,
+    "profile": {
+      "age": 30
+    }
+  }
+]
+```
+
+### Generated Go Struct
+
+```go
+type User struct {
+    ID      int     `json:"id"`
+    Name    string  `json:"name"`
+    Email   *string `json:"email,omitempty"`
+    Active  bool    `json:"active"`
+    Profile Profile `json:"profile"`
+}
+
+type Profile struct {
+    Age int `json:"age"`
+}
+```
+
+*The generated output is illustrative. Actual output depends on generator options and type-mapping rules.*
+
+## Getting Started
 
 ### Prerequisites
 
-- Node.js (LTS recommended)
+- Node.js
 - npm
 
 ### Installation
 
-Clone the repository:
-
 ```bash
 git clone <repository-url>
-```
-
-Navigate to the project directory:
-
-```bash
 cd struct-convert
-```
-
-Install dependencies:
-
-```bash
 npm install
 ```
 
-Start the development server:
+### Development
 
 ```bash
 npm run dev
 ```
 
-Open the local development URL provided by Vite.
+### Build
 
-## 💡 Usage
-
-1. Open Struct Convert.
-2. Paste your JSON into the input editor.
-3. Select the desired Go struct options.
-4. View the generated Go structs.
-5. Copy the generated code and use it in your Go project.
-
-### Example
-
-**Input JSON**
-
-```json
-{
-  "id": 1,
-  "name": "John",
-  "email": "john@example.com",
-  "is_active": true,
-  "profile": {
-    "age": 25,
-    "address": "Bangkok"
-  }
-}
+```bash
+npm run build
 ```
 
-**Generated Go Struct**
-
-```go
-type User struct {
-    ID       int     `json:"id"`
-    Name     string  `json:"name"`
-    Email    string  `json:"email"`
-    IsActive bool    `json:"is_active"`
-    Profile  Profile `json:"profile"`
-}
-
-type Profile struct {
-    Age     int    `json:"age"`
-    Address string `json:"address"`
-}
-```
-
-## 🧠 Architecture
-
-Struct Convert uses a schema-based architecture to separate JSON parsing, type inference, and code generation.
-
-```text
-JSON Input
-    |
-    v
-JSON Parser
-    |
-    v
-Schema Inference
-    |
-    v
-Schema Normalization
-    |
-    v
-Go Struct Generator
-    |
-    v
-Generated Go Code
-```
-
-### Engine Responsibilities
-
-| Module | Responsibility |
-|---|---|
-| Parser | Parse and validate JSON input |
-| Type Inference | Detect JSON value types |
-| Object Inference | Analyze object properties |
-| Array Inference | Analyze array elements |
-| Type Merge | Merge different types and object schemas |
-| Go Generator | Generate Golang struct definitions |
-| Go Type Mapper | Map inferred types to Go types |
-| Go Naming | Convert JSON field names to Go naming conventions |
-| Go Tags | Generate JSON struct tags |
-
-### Design Principles
-
-- Keep the inference engine independent from React.
-- Separate schema analysis from code generation.
-- Use reusable schema models.
-- Make the architecture extensible for additional programming languages.
-- Maintain predictable and testable type inference rules.
-
-## 🧪 Testing
-
-Run unit tests:
+### Run Tests
 
 ```bash
 npm run test
 ```
 
-Run tests with coverage:
+## Design Principles
 
-```bash
-npm run test -- --coverage
-```
+### 1. Separation of Concerns
 
-## 🔍 Code Quality
+The UI, parsing, inference, validation, and code generation layers are independent.
 
-Run Oxlint:
+### 2. Type Safety
 
-```bash
-npx oxlint .
-```
+Use TypeScript to maintain predictable schema structures and reduce runtime errors.
 
-Run ESLint (if configured):
+### 3. Extensibility
 
-```bash
-npx eslint .
-```
+The engine should support additional programming languages without changing the core inference logic.
 
-Format code:
+### 4. Testability
 
-```bash
-npx prettier --write .
-```
+Core engine modules should be independently testable without depending on React components.
 
-## 🗺️ Roadmap
+### 5. Deterministic Output
 
-- [x] Initialize React + TypeScript + Vite project
-- [ ] Implement JSON Parser
-- [ ] Implement Type Inference Engine
-- [ ] Implement Schema Merge
-- [ ] Implement Go Struct Generator
-- [ ] Support JSON Object and Array
-- [ ] Implement JSON Tags
-- [ ] Build Converter UI
-- [ ] Add Unit Tests
-- [ ] Add Advanced Generator Options
-- [ ] Support Multiple Programming Languages
+The same input and configuration should produce consistent schema and generated code.
 
-## 🤝 Contributing
+## Roadmap
 
-Contributions, ideas, and suggestions are welcome.
+### Phase 1 — Core Engine
+- [x] Project architecture
+- [ ] JSON Parser
+- [ ] Type Inference Engine
+- [ ] Schema Normalization
+- [ ] Schema Validator
+- [ ] Type Constraints
+- [ ] Core Engine Tests
 
-If you find a bug or have an idea for improvement, feel free to open an issue or submit a pull request.
+### Phase 2 — Go Generator
+- [ ] Go Type Mapper
+- [ ] Go Naming Rules
+- [ ] Go Struct Generator
+- [ ] JSON Tags
+- [ ] Go Formatting
 
-## 📄 License
+### Phase 3 — User Interface
+- [ ] JSON Editor
+- [ ] Generated Struct Viewer
+- [ ] Converter Options
+- [ ] Copy Generated Code
+- [ ] Error and Warning Display
 
-This project is currently under development. License details will be added later.
+### Phase 4 — Advanced Features
+- [ ] Multiple Root Types
+- [ ] Advanced Type Mapping
+- [ ] Additional Programming Languages
+- [ ] Custom Naming Rules
+- [ ] Import and Export Options
+
+## Project Philosophy
+
+Struct Convert is designed to be more than a simple JSON-to-Struct converter.
+
+Its core is a reusable schema inference engine that understands data structures, handles inconsistencies, and provides a foundation for generating strongly typed code across multiple programming languages.
+
+---
+
+**Built with React and TypeScript.**

@@ -1,100 +1,102 @@
 # Struct Convert
 
-เครื่องมือสำหรับแปลง JSON ให้เป็น Go Struct โดยอัตโนมัติ ช่วยลดเวลาในการเขียน Struct ด้วยตัวเอง และทำให้การสร้าง Go Model จาก JSON ทำได้ง่ายและรวดเร็วยิ่งขึ้น
+**Struct Convert** คือเครื่องมือแปลง JSON ให้เป็น Struct หรือโครงสร้างข้อมูลของภาษาโปรแกรมมิ่งต่าง ๆ ที่ออกแบบมาให้ใช้งานง่าย รวดเร็ว และมีความยืดหยุ่น
 
-## ภาพรวมโปรเจกต์
+ระบบจะวิเคราะห์ข้อมูล JSON ที่ได้รับ ทำการตรวจจับและอนุมานชนิดข้อมูล (Type Inference) สร้าง Schema ที่เป็นมาตรฐาน และนำไปสร้าง Source Code ตามภาษาที่ต้องการ
 
-**Struct Convert** เป็น Developer Tool ที่ช่วยแปลงข้อมูล JSON ให้กลายเป็น Go Struct โดยผู้ใช้สามารถวาง JSON ที่ต้องการแปลง จากนั้นระบบจะวิเคราะห์โครงสร้างข้อมูลและสร้าง Go Struct ให้โดยอัตโนมัติ
+โปรเจกต์นี้ให้ความสำคัญกับความถูกต้องของข้อมูล การแยกส่วนการทำงาน และความสามารถในการขยายระบบในอนาคต
 
-โปรเจกต์นี้พัฒนาด้วย React และ TypeScript โดยประมวลผลข้อมูลทั้งหมดภายใน Browser จึงไม่จำเป็นต้องมี Backend Server ในเวอร์ชันแรก
+## Features
 
-## คุณสมบัติหลัก
-
-- **JSON to Go Struct** — แปลง JSON เป็น Go Struct โดยอัตโนมัติ
-- **รองรับ JSON Object** — สามารถแปลง JSON Object ที่มีข้อมูลซ้อนกันได้
-- **รองรับ JSON Array** — สามารถวิเคราะห์ Array และสร้าง Struct สำหรับข้อมูลภายใน Array ได้
-- **Nested Struct** — รองรับ Object และ Array ที่ซ้อนกันหลายระดับ
-- **Type Inference** — วิเคราะห์ชนิดข้อมูลจาก JSON และเลือก Go Type ที่เหมาะสม
-- **JSON Tags** — สร้าง JSON Tags ให้กับ Struct โดยอัตโนมัติ
-- **Copy Code** — คัดลอก Go Struct ที่สร้างขึ้นได้ทันที
-- **Client-side Processing** — ประมวลผลภายใน Browser โดยไม่ต้องส่งข้อมูลไปยัง Backend
-
-## คุณสมบัติที่วางแผนไว้
-
-- รองรับ JSON ตัวอย่างหลายชุดเพื่อรวมและวิเคราะห์ Schema
-- ปรับแต่งชื่อ Struct และ Field ได้
-- ตั้งค่ารูปแบบ Pointer และ JSON Tags ได้
-- รองรับการสร้าง Code สำหรับภาษาอื่น เช่น TypeScript
-- บันทึกประวัติการแปลงข้อมูล
+- **รองรับ JSON Object** — แปลง JSON Object ให้เป็นโครงสร้างข้อมูล
+- **รองรับ JSON Array** — วิเคราะห์ Array ของ Object และรวมโครงสร้างให้เป็น Schema เดียวกัน
+- **Nested Structures** — รองรับ Object และ Array ที่ซ้อนกันหลายระดับ
+- **Type Inference** — ตรวจจับชนิดข้อมูลอัตโนมัติ เช่น String, Number, Integer, Decimal, Boolean, Null, Object และ Array
+- **Optional Fields** — ตรวจจับ Field ที่อาจไม่มีอยู่ในบาง Object
+- **Nullable Fields** — แยกความแตกต่างระหว่าง Field ที่ไม่มีอยู่กับ Field ที่มีค่าเป็น `null`
+- **Union Types** — รองรับ Field ที่มีชนิดข้อมูลแตกต่างกันในแต่ละตัวอย่าง
+- **Schema Normalization** — รวมและจัดรูปแบบ Schema ให้เป็นมาตรฐานเดียวกัน
+- **Schema Validation** — ตรวจสอบความถูกต้องของ Schema และกำหนดข้อจำกัดของชนิดข้อมูล
+- **Extensible Generators** — ออกแบบให้รองรับการสร้าง Code ได้หลายภาษา
+- **Client-side Processing** — ประมวลผล JSON ภายใน Browser โดยไม่จำเป็นต้องมี Backend
 
 ## Tech Stack
 
-| Technology | Purpose |
+| Technology | วัตถุประสงค์ |
 |---|---|
-| React | สร้าง User Interface |
-| TypeScript | พัฒนาระบบด้วย Static Typing |
+| React | พัฒนา User Interface |
+| TypeScript | พัฒนา Application และ Engine แบบ Type-safe |
 | Vite | Development Server และ Build Tool |
-| Monaco Editor | Code Editor สำหรับ JSON และ Go |
+| Monaco Editor | Editor สำหรับ JSON Input และ Code Output |
 | Vitest | Unit Testing |
-| Oxlint | Code Linting |
-| Prettier | Code Formatting |
-| gofmt | จัดรูปแบบ Go Code ที่สร้างขึ้น |
+| Prettier | จัดรูปแบบ Code |
+| Oxlint | ตรวจสอบคุณภาพ Code |
+| gofmt | จัดรูปแบบ Go Code |
 
-> รายการข้างต้นเป็น Technology Stack ที่วางแผนใช้ในโปรเจกต์ โดยบางรายการอาจยังไม่ได้ติดตั้งหรือเชื่อมต่อในปัจจุบัน
+## Architecture
 
-## Project Structure
-
-โปรเจกต์ใช้แนวทาง Feature-based Architecture ร่วมกับการแยกหน้าที่ของแต่ละส่วน เพื่อให้สามารถดูแลและขยายระบบได้ง่ายในอนาคต
+โปรเจกต์ใช้แนวคิด Feature-based Architecture โดยแยกส่วนการทำงานของ Converter Engine ออกจาก User Interface เพื่อให้ Core Logic สามารถนำกลับมาใช้ซ้ำ ทดสอบ และพัฒนาต่อได้โดยไม่ขึ้นอยู่กับ UI
 
 ```text
 src/
-├── app/
-│   ├── App.tsx
-│   └── providers/
-│
-├── features/
-│   └── converter/
-│       ├── components/
-│       │   ├── JsonEditor.tsx
-│       │   ├── StructViewer.tsx
-│       │   ├── ConverterOptions.tsx
-│       │   └── ConverterToolbar.tsx
-│       │
-│       ├── hooks/
-│       │   └── useConverter.ts
-│       │
-│       ├── engine/
-│       │   ├── parser/
-│       │   │   └── json-parser.ts
-│       │   │
-│       │   ├── inference/
-│       │   │   ├── infer-schema.ts
-│       │   │   ├── infer-type.ts
-│       │   │   ├── merge-types.ts
-│       │   │   ├── infer-object.ts
-│       │   │   └── infer-array.ts
-│       │   │
-│       │   ├── generators/
-│       │   │   └── golang/
-│       │   │       ├── go-generator.ts
-│       │   │       ├── go-type-mapper.ts
-│       │   │       ├── go-naming.ts
-│       │   │       └── go-tags.ts
-│       │   │
-│       │   └── core/
-│       │       ├── schema.ts
-│       │       └── errors.ts
-│       │
-│       ├── types/
-│       │   └── converter.types.ts
-│       │
-│       ├── constants/
-│       │   └── default-options.ts
-│       │
-│       └── index.ts
-│
+├── assets/
+|
 ├── components/
-│   └── ui/
+│   |── converter/
+|   |     |── JsonEditor.tsx
+│   |     ├── StructViewer.tsx
+│   |     ├── ConverterOptions.tsx
+│   |     └── ConverterToolbar.tsx
+|   |
+|   └── ui/
+|
+├── features/
+│   |── converter/
+│   |    ├── engine/
+│   |    │   |── core/
+│   |    │   |    └── errors.ts
+|   |    |   |    
+│   |    │   ├── generators/ ( แปลง Schema เป็น Code ของแต่ละภาษา )
+│   |    │   │    ├── go-generator.ts ( สร้าง Go Struct Code )
+│   |    │   │    ├── go-naming.ts ( จัดการชื่อ Struct และ Field ตาม Convention ของ Go )
+│   |    │   │    ├── go-tags.ts ( สร้าง JSON Tags )
+│   |    │   │    └── go-type-mapper.ts ( แปลง Schema เป็น Go Types )
+|   |    |   |
+│   |    │   ├── inference/ ( วิเคราะห์ Type และสร้าง Schema )
+│   |    │   │   ├── inndex.ts
+│   |    │   │   ├── infer-array.ts ( วิเคราะห์ Array และรวม Type ของสมาชิก )
+│   |    │   │   ├── infer-object.ts (	วิเคราะห์ Object และ Field )
+│   |    │   │   ├── infer-schema.ts 
+│   |    │   │   ├── infer-type.ts ( วิเคราะห์ Type ของ Value เป็น Public Entry Point ) 
+│   |    │   │   ├── infer-value.ts ( ตรวจสอบ Value และ Dispatch )
+│   |    │   │   ├── merge-types.ts ( รวม Type จากหลายตัวอย่าง )
+│   |    │   │   ├── normalize-schema.ts ( แปลงเป็น Canonical Schema )
+│   |    │   │   └── schema.ts 	( นิยาม Schema กลาง )
+│   |    │   │   
+│   |    │   ├── parser/ ( แปลง JSON String เป็นข้อมูล )
+│   |    │   │   └── json-parser.ts
+│   |    │   │
+│   |    │   ├── validation/
+│   |    │   │   |── schema-validator.ts ( ตรวจสอบ Schema )
+│   |    │   │   └── type-constraints.ts ( ตรวจเงื่อนไขและข้อจำกัดของ Type )
+│   |    │   │
+|   |    |   └──index.ts
+|   |    |
+│   |    └──  hooks/
+│   |          └── useConverter.ts
+│   |
+│   └── index.ts
+│
+├── httpsRequest/ ( axios https)
+│   └── createHttpRequest.ts
+│   └── index.ts
+|
+├── layouts/
+|
+├── pages/
+|
+├── service/ ( Business Logic / API )
+|
 │
 ├── lib/
 ├── utils/
@@ -103,301 +105,225 @@ src/
 └── main.tsx
 ```
 
-### หน้าที่ของแต่ละส่วน
+สามารถเพิ่ม Module ใหม่ เช่น Schema Normalization และ Validation ภายใน Engine เดิมได้ โดยไม่จำเป็นต้องเปลี่ยนโครงสร้างหลักของโปรเจกต์
 
-| ส่วน | หน้าที่ |
-|---|---|
-| `components/` | UI Components ของ Converter |
-| `hooks/` | จัดการ State และ Logic ที่เกี่ยวข้องกับ UI |
-| `parser/` | ตรวจสอบและ Parse JSON |
-| `inference/` | วิเคราะห์โครงสร้างและอนุมานชนิดข้อมูล |
-| `generators/` | สร้าง Source Code ตามภาษาที่ต้องการ |
-| `core/` | เก็บ Schema และ Error Definitions |
-| `types/` | Type Definitions ที่ใช้ใน Feature |
-| `constants/` | ค่าเริ่มต้นและ Configuration |
-| `utils/` | Utility Functions ที่ใช้ร่วมกัน |
+## Conversion Pipeline
 
-## Architecture
-
-ระบบแบ่งการทำงานหลักออกเป็น 3 ขั้นตอน
+กระบวนการทำงานของ Converter Engine ถูกแบ่งออกเป็นขั้นตอนดังนี้
 
 ```text
-       JSON Input
-            |
-            v
-    +---------------+
-    |     Parser    |
-    +---------------+
-            |
-            v
-    +---------------+
-    | Type Inference|
-    |   & Schema    |
-    +---------------+
-            |
-            v
-    +---------------+
-    | Go Generator  |
-    +---------------+
-            |
-            v
-       Go Struct
+JSON Input
+    │
+    ▼
+JSON Parser
+    │
+    ▼
+Type Inference
+    │
+    ▼
+Schema Normalization
+    │
+    ▼
+Schema Validation
+    │
+    ▼
+Code Generator
+    │
+    ▼
+Generated Struct
 ```
 
-### 1. Parser
+### 1. JSON Parser
 
-รับ JSON จากผู้ใช้และตรวจสอบความถูกต้องของข้อมูล ก่อนส่งต่อให้ระบบวิเคราะห์โครงสร้าง
+ทำหน้าที่แปลง JSON String ให้เป็นข้อมูลที่สามารถนำไปประมวลผลต่อได้ พร้อมจัดการกรณี JSON ไม่ถูกต้องและส่ง Error ที่เหมาะสม
+
+รองรับ:
+- JSON Object
+- JSON Array
+- Nested Object
+- Nested Array
 
 ### 2. Type Inference
 
-วิเคราะห์โครงสร้าง JSON เพื่อสร้าง Schema กลาง (Intermediate Representation หรือ IR) โดยไม่ผูกติดกับภาษาโปรแกรมใดภาษาหนึ่ง
+วิเคราะห์ข้อมูล JSON เพื่ออนุมานชนิดข้อมูลและสร้าง Schema เบื้องต้น
 
-ตัวอย่างการวิเคราะห์ชนิดข้อมูล:
+ชนิดข้อมูลที่รองรับ:
+- String
+- Integer
+- Decimal
+- Boolean
+- Null
+- Object
+- Array
+- Union
 
-| JSON Type | Go Type |
-|---|---|
-| String | `string` |
-| Integer | `int` |
-| Decimal | `float64` |
-| Boolean | `bool` |
-| Object | `struct` |
-| Array | `[]T` |
-| Null | ขึ้นอยู่กับชนิดข้อมูลและการตั้งค่า |
+นอกจากนี้ยังตรวจจับ Optional และ Nullable Fields จากการวิเคราะห์ Object หลายตัวอย่างได้
 
-การใช้ Schema กลางช่วยให้สามารถเพิ่ม Generator สำหรับภาษาอื่นได้ในอนาคต โดยไม่จำเป็นต้องเขียนระบบวิเคราะห์ JSON ใหม่
+### 3. Schema Normalization
 
-### 3. Go Generator
+ทำหน้าที่จัดรูปแบบ Schema ที่ได้จาก Type Inference ให้เป็นมาตรฐานเดียวกัน
 
-นำ Schema ที่ได้จาก Type Inference มาสร้าง Go Struct โดยจัดการเรื่องต่าง ๆ เช่น
+ความรับผิดชอบ:
+- รวม Union Types ที่ซ้อนกันให้เป็นระดับเดียว
+- ลบ Type Variants ที่ซ้ำกัน
+- รวม Object Schema ที่มีโครงสร้างเข้ากันได้
+- จัดการ Number Types
+- จัดการ Nullability
+- รักษาข้อมูล Metadata ของ Array
+- ทำให้ผลลัพธ์ของ Schema มีรูปแบบที่แน่นอน
 
-- การแปลงชื่อ Field ให้เป็นรูปแบบ Go Naming Convention
-- การสร้าง Nested Struct
-- การ Mapping JSON Type เป็น Go Type
-- การสร้าง JSON Tags
-- การจัดการ Pointer และ Optional Fields ตาม Configuration
+### 4. Schema Validation
+
+ตรวจสอบ Schema หลังจากผ่านกระบวนการ Normalization ก่อนนำไปสร้าง Source Code
+
+ความรับผิดชอบ:
+- ตรวจสอบโครงสร้างและ Metadata
+- ตรวจจับชนิดข้อมูลที่ไม่ถูกต้องหรือไม่รองรับ
+- บังคับใช้ข้อจำกัดของชนิดข้อมูล
+- จำกัดความลึกและความซับซ้อนของ Schema
+- แจ้งเตือนหรือรายงานปัญหาพร้อมระบุตำแหน่งของ Field
+
+### 5. Code Generator
+
+แปลง Schema ที่ผ่านการตรวจสอบแล้วให้เป็น Source Code ของภาษาโปรแกรมมิ่งที่เลือก
+
+ในช่วงเริ่มต้นจะพัฒนา Generator สำหรับภาษา Go ก่อน
+
+## Example
+
+### Input
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Alice",
+    "email": "alice@example.com",
+    "active": true,
+    "profile": {
+      "age": 25
+    }
+  },
+  {
+    "id": 2,
+    "name": "Bob",
+    "active": false,
+    "profile": {
+      "age": 30
+    }
+  }
+]
+```
+
+### Generated Go Struct
+
+```go
+type User struct {
+    ID      int     `json:"id"`
+    Name    string  `json:"name"`
+    Email   *string `json:"email,omitempty"`
+    Active  bool    `json:"active"`
+    Profile Profile `json:"profile"`
+}
+
+type Profile struct {
+    Age int `json:"age"`
+}
+```
+
+*ตัวอย่างผลลัพธ์นี้ใช้เพื่ออธิบายแนวคิดเท่านั้น ผลลัพธ์จริงอาจแตกต่างตาม Generator Options และกฎการ Mapping ชนิดข้อมูล*
 
 ## Getting Started
 
 ### Prerequisites
-
-สิ่งที่ต้องมีในเครื่องก่อนเริ่มต้นใช้งาน
 
 - Node.js
 - npm
 
 ### Installation
 
-Clone Repository:
-
 ```bash
 git clone <repository-url>
-```
-
-เข้าไปยัง Project Directory:
-
-```bash
 cd struct-convert
-```
-
-ติดตั้ง Dependencies:
-
-```bash
 npm install
 ```
 
 ### Development
 
-เริ่มต้น Development Server:
-
 ```bash
 npm run dev
 ```
 
-จากนั้นเปิด URL ที่ Vite แสดงใน Terminal โดยปกติจะเป็น:
-
-```text
-http://localhost:5173
-```
-
 ### Build
-
-สำหรับ Build โปรเจกต์:
 
 ```bash
 npm run build
 ```
 
-ตรวจสอบ Build Preview:
-
-```bash
-npm run preview
-```
-
-## Usage
-
-### ตัวอย่าง JSON Input
-
-```json
-{
-  "id": 1,
-  "name": "John",
-  "email": "john@example.com",
-  "age": 25,
-  "is_active": true,
-  "profile": {
-    "address": "Bangkok",
-    "phone": "0812345678"
-  }
-}
-```
-
-### ตัวอย่าง Go Struct Output
-
-```go
-type User struct {
-    ID       int    `json:"id"`
-    Name     string `json:"name"`
-    Email    string `json:"email"`
-    Age      int    `json:"age"`
-    IsActive bool   `json:"is_active"`
-    Profile  Profile `json:"profile"`
-}
-
-type Profile struct {
-    Address string `json:"address"`
-    Phone   string `json:"phone"`
-}
-```
-
-### รองรับ JSON Array
-
-ตัวอย่าง Input:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "John",
-    "age": 25
-  },
-  {
-    "id": 2,
-    "name": "Jane",
-    "email": "jane@example.com"
-  }
-]
-```
-
-ระบบจะวิเคราะห์ข้อมูลทุก Object ภายใน Array เพื่อสร้าง Struct ที่ครอบคลุม Field ที่พบทั้งหมด และสามารถสร้าง Go Slice สำหรับนำไปใช้งานได้
-
-## Development Guidelines
-
-### Separation of Concerns
-
-แยกความรับผิดชอบของแต่ละส่วนให้ชัดเจน เช่น
-
-- Parser ไม่ควรรับผิดชอบการสร้าง Go Code
-- Inference Engine ไม่ควรผูกติดกับ Go Type
-- Generator ไม่ควรต้อง Parse JSON ใหม่
-- UI ไม่ควรมี Business Logic ของการแปลงข้อมูล
-
-### Schema-based Design
-
-ใช้ Schema กลางเป็นตัวเชื่อมระหว่างการวิเคราะห์ข้อมูลและการสร้าง Code เพื่อรองรับการเพิ่มภาษาใหม่ในอนาคต
-
-### Type Safety
-
-ใช้ TypeScript เพื่อกำหนด Type ให้กับข้อมูลและลดข้อผิดพลาดจากการทำงานของระบบ
-
-## Testing
-
-ใช้ Vitest สำหรับทดสอบ Logic ของระบบ โดยแยกการทดสอบตามส่วนการทำงาน
-
-หัวข้อที่ควรทดสอบ:
-
-- JSON Parsing และ Validation
-- Primitive Type Inference
-- Object และ Nested Object Inference
-- Array และ Nested Array Inference
-- Type Merging
-- Optional และ Nullable Fields
-- Go Naming Convention
-- Go Type Mapping
-- Go Struct Generation
-- JSON Tag Generation
-
-คำสั่งสำหรับรัน Test:
+### Run Tests
 
 ```bash
 npm run test
 ```
 
-รัน Test พร้อม Coverage:
+## Design Principles
 
-```bash
-npm run test -- --coverage
-```
+### 1. Separation of Concerns
 
-## Code Quality
+แยกหน้าที่ของ UI, Parser, Type Inference, Validation และ Code Generator ออกจากกันอย่างชัดเจน
 
-ตรวจสอบ Code ด้วย Oxlint:
+### 2. Type Safety
 
-```bash
-npx oxlint .
-```
+ใช้ TypeScript เพื่อกำหนดรูปแบบข้อมูลและ Schema ให้ชัดเจน ลดข้อผิดพลาดที่อาจเกิดขึ้นระหว่าง Runtime
 
-จัดรูปแบบ Code ด้วย Prettier:
+### 3. Extensibility
 
-```bash
-npx prettier --write .
-```
+ออกแบบ Engine ให้สามารถเพิ่มภาษาโปรแกรมมิ่งใหม่ได้ โดยไม่ต้องแก้ไข Core Inference Logic
 
-สำหรับ Go Code ที่สร้างขึ้น สามารถใช้ `gofmt` เพื่อจัดรูปแบบให้เป็นมาตรฐานของภาษา Go
+### 4. Testability
+
+Core Engine แต่ละส่วนต้องสามารถทดสอบแยกจากกันได้ โดยไม่ต้องพึ่งพา React Components
+
+### 5. Deterministic Output
+
+เมื่อใช้ Input และ Configuration เดียวกัน ควรได้ Schema และ Source Code ที่มีผลลัพธ์เหมือนเดิมทุกครั้ง
 
 ## Roadmap
 
-### Phase 1: Core Engine
+### Phase 1 — Core Engine
+- [x] Project Architecture
+- [ ] JSON Parser
+- [ ] Type Inference Engine
+- [ ] Schema Normalization
+- [ ] Schema Validator
+- [ ] Type Constraints
+- [ ] Core Engine Tests
 
-- [x] Initialize React + TypeScript + Vite project
-- [ ] Implement JSON Parser
-- [ ] Implement Type Inference
-- [ ] Implement Object และ Array Inference
-- [ ] Implement Type Merging
-- [ ] Create Schema Model
+### Phase 2 — Go Generator
+- [ ] Go Type Mapper
+- [ ] Go Naming Rules
+- [ ] Go Struct Generator
+- [ ] JSON Tags
+- [ ] Go Formatting
 
-### Phase 2: Go Generator
+### Phase 3 — User Interface
+- [ ] JSON Editor
+- [ ] Generated Struct Viewer
+- [ ] Converter Options
+- [ ] Copy Generated Code
+- [ ] Error and Warning Display
 
-- [ ] Implement Go Type Mapper
-- [ ] Implement Go Naming Convention
-- [ ] Generate Nested Struct
-- [ ] Generate JSON Tags
-- [ ] Support Pointer Options
-- [ ] Support Optional Fields
-- [ ] Format Generated Go Code
+### Phase 4 — Advanced Features
+- [ ] Multiple Root Types
+- [ ] Advanced Type Mapping
+- [ ] รองรับภาษาโปรแกรมมิ่งเพิ่มเติม
+- [ ] Custom Naming Rules
+- [ ] Import and Export Options
 
-### Phase 3: User Interface
+## Project Philosophy
 
-- [ ] Create JSON Editor
-- [ ] Create Go Struct Viewer
-- [ ] Implement Converter Options
-- [ ] Implement Copy Code
-- [ ] Implement Error Handling และ Validation
-- [ ] Implement Responsive Layout
+Struct Convert ไม่ได้ถูกออกแบบมาให้เป็นเพียงเครื่องมือแปลง JSON เป็น Struct เท่านั้น แต่เป็น Schema Inference Engine ที่สามารถเข้าใจโครงสร้างข้อมูล จัดการกับความแตกต่างของข้อมูล และเป็นพื้นฐานสำหรับการสร้าง Strongly Typed Code ในภาษาโปรแกรมมิ่งต่าง ๆ
 
-### Phase 4: Advanced Features
+---
 
-- [ ] Support Multiple JSON Samples
-- [ ] Improve Schema Merging
-- [ ] Custom Struct และ Field Naming
-- [ ] Add TypeScript Generator
-- [ ] Conversion History
-
-## Contributing
-
-ยินดีต้อนรับการเสนอแนะ การแจ้งปัญหา และการร่วมพัฒนาโปรเจกต์
-
-หากพบ Bug หรือมี Feature ที่ต้องการเพิ่มเติม สามารถเปิด Issue เพื่อพูดคุยและเสนอแนวทางการปรับปรุงได้
-
-## License
-
-อยู่ระหว่างการพัฒนาและกำหนด License
+**Built with React and TypeScript.**
